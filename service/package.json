@@ -21,6 +21,11 @@
     "express": "^5.1.0",
     "multer": "^2.0.0",
     "nodemon": "^3.1.10",
+    "openai": "^4.103.0",
+    "pdf-parse": "^1.1.1",
     "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@types/pdf-parse": "^1.1.5"
   }
 }
