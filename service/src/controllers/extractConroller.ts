@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import fs from 'fs';
+import path from 'path';
 import { extractDataFromPdfDirectly } from "../utils/ai";
 
 export const extractDocument = async (req: Request, res: Response) => {
@@ -11,19 +12,23 @@ export const extractDocument = async (req: Request, res: Response) => {
         });
         return;
     }
+
     try {
-        // Pass the file path to the extractor
-        const result = await extractDataFromPdfDirectly(file.path);
-
-        // Remove the file after processing
+        const result = await extractDataFromPdfDirectly(file.path); // Use file.path
+        // Optionally delete the file after processing
         fs.unlinkSync(file.path);
-
         res.json({ success: true, data: result });
-
     } catch (error) {
-        console.log("Error Processing Pdf", error);
+        if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        let details = "Unknown error";
+        if (error instanceof Error) {
+            details = error.message;
+        } else if (typeof error === "string") {
+            details = error;
+        }
         res.status(500).json({
-            error: "Failed to extract Data"
+            error: "Failed to extract Data",
+            details
         });
     }
 };

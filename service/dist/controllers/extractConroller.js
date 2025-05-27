@@ -15,16 +15,24 @@ const extractDocument = async (req, res) => {
         return;
     }
     try {
-        // Pass the file path to the extractor
-        const result = await (0, ai_1.extractDataFromPdfDirectly)(file.path);
-        // Remove the file after processing
+        const result = await (0, ai_1.extractDataFromPdfDirectly)(file.path); // Use file.path
+        // Optionally delete the file after processing
         fs_1.default.unlinkSync(file.path);
         res.json({ success: true, data: result });
     }
     catch (error) {
-        console.log("Error Processing Pdf", error);
+        if (file.path && fs_1.default.existsSync(file.path))
+            fs_1.default.unlinkSync(file.path);
+        let details = "Unknown error";
+        if (error instanceof Error) {
+            details = error.message;
+        }
+        else if (typeof error === "string") {
+            details = error;
+        }
         res.status(500).json({
-            error: "Failed to extract Data"
+            error: "Failed to extract Data",
+            details
         });
     }
 };
